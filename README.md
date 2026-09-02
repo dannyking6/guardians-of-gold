@@ -7,6 +7,38 @@ aucune dépendance externe bloquante**.
 - **Taille** : ~8.5 MB (runtime JS, spritesheets, 23 sons .webm, 3 polices, 2 squelettes Spine .scon)
 - **Dépendances externes restantes** : AUCUNE (prouvé par pare-feu applicatif)
 
+## About the game
+
+**Guardians of Gold** is a delightful, family-friendly arcade defense game set in a
+medieval castle after dark. You are the castle's loyal guardian — and somewhere out
+there, a mischievous, quick-footed thief is prowling for your precious gold. Keep
+your eyes peeled, spot the sneaky intruder the moment he shows his face, and tap
+him away before your treasure disappears!
+
+Charming hand-drawn 2D art, silky Spine skeletal animations, a living castle scene
+with flickering torches and swaying leaves, and 23 original sound effects make every
+round feel alive. The longer you hold the line, the bolder the thief gets — a simple
+premise with a genuinely rewarding difficulty curve. Easy to pick up, hard to put down.
+
+## Controls
+
+Designed for **one-finger play** — every interaction is a tap or a click:
+
+| Device | Input | Action |
+|---|---|---|
+| 📱 Smartphone / tablet (touch) | **Tap** | Swat the thief, navigate menus, confirm prompts, accept bonus offers |
+| 💻 PC / Mac (mouse) | **Left click** | Exactly the same as a tap |
+| 💻 Laptop (trackpad) | **Single click** | Exactly the same as a tap |
+| ⌨️ Keyboard | *Not required* | All gameplay is pointer/touch based |
+
+**Tips:**
+- The mouse fully emulates touch on desktop — the entire game is playable with
+clicks alone.
+- The game runs in **portrait orientation** (design resolution 640×1136). Hold your
+phone upright, or enjoy the auto-scaled layout on any screen size.
+- Works offline in any modern browser (Chrome, Firefox, Safari, Edge). No account,
+no download, no network needed.
+
 ## Lancer le jeu
 
 Un serveur HTTP est nécessaire (le runtime Construct refuse `file://`) :
