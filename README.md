@@ -20,22 +20,47 @@ Un serveur HTTP est nécessaire (le runtime Construct refuse `file://`) :
 
 | Fichier | Patch |
 |---|---|
-| `index.html` | SDK GameSnacks CDN (`sdks.gamesnacks.com`) remplacé par `gamesnacks-sdk-stub.js` ; retraits des scripts 404 (`offlineclient.js`, `register-sw.js`) |
-| `gamesnacks-sdk-stub.js` | **NOUVEAU** — stub du SDK : pubs simulées (interstitial + rewarded auto-gratifié), audio activé, sauvegarde via localStorage (`gs_local_*`) |
+| `index.html` | SDK GameSnacks CDN retiré, remplacé par `game-adapter.js` ; retraits des scripts 404 (`offlineclient.js`, `register-sw.js`) |
+| `game-adapter.js` | **NOUVEAU** — couche d'adaptation neutre en 2 étages (voir ci-dessous) : pubs simulées (interstitial + rewarded auto-gratifié), audio activé, sauvegarde via localStorage (`local_save_*`) |
 | `scripts/c3main.js` | Sitelock neutralisé (2 fonctions obfusquées `Sitelock_Event3/7_Act9` remplacées par `AllOk=true`) |
 | `icons/loading-logo.png` | 404 Google remplacée par l'icône officielle 512×512 du jeu |
+
+**Aucune trace du SDK d'origine ne subsiste** : `sdk.js` (le pont GameSnacks) et
+le stub ont été supprimés. Le jeu n'appelle que des fonctions globales neutres
+(`gameReady`, `getItem`, `startRewardAd`…), re-implementées par l'adaptateur.
+
+## Architecture de l'adaptateur (pour brancher un autre SDK)
+
+```
+[Jeu Construct] --fonctions globales--> [PONT game-adapter.js] --interface--> [DRIVER]
+                                              |                        LocalDriver par défaut
+                                              |                        (ou window.GameDriver injecté)
+                        c3_callFunction (checksound, displayAdPrompt,
+                         gratifyUser, adNotAvailable, gamePause/Resume)
+```
+
+- **Le pont** expose les 12 fonctions globales que le jeu appelle et renvoie les
+events via `c3_callFunction`. Il ne connaît aucune plateforme.
+- **Le driver** implémente l'interface : `getAudioEnabled`, `onAudioChange`,
+`showInterstitialAd`, `requestRewardedAd`, `showRewardedAd`, `onGamePause/Resume`,
+`notifyReady/FirstFrame/GameOver/LevelComplete/Score`, `storageGet/Set/Remove/Clear`.
+- **Brancher un autre SDK** : définir `window.GameDriver = monImpl` avant le
+chargement de `game-adapter.js`. Aucune autre modification nécessaire.
 
 ## Preuves de test (Playwright + pare-feu applicatif)
 
 - **0 requête externe** (toute URL non-localhost bloquée par route-interceptor)
 - 23/23 sons chargés depuis `media/` local
+- **Test unitaire du pont** : les 12 routes invoquées directement — `getData`,
+`checksound`, `displayAdPrompt`, `gratifyUser`, interstitiel complet, télémétrie,
+storage — toutes vérifiées, 0 erreur page
 - Flux complet joué par un bot :
   - Splash → menu → jeu (`playbtn` cliqué)
   - Pub rewarded simulée → `gratifyUser` → récompense accordée
   - Tutoriel complété (`tapOnStudent=1` sauvegardé)
-  - ~100 taps CV (vision par ordinateur) sur le voleur en mouvement
+  - ~150 taps CV (vision par ordinateur) sur le voleur en mouvement
   - Fin de manche : `gameOver fired` → score sauvegardé (`setItem`)
-- 0 erreur fatale pendant les 5 minutes de session
+- 0 erreur fatale pendant les sessions de test (5 et 8 min)
 
 ## Structure
 

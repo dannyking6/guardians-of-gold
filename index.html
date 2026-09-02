@@ -18,7 +18,7 @@ function(c){var e=this.l();c.H(e.resolve,e.reject)};b.prototype.J=function(c,e){
 l.i);}}var l=this;this.h==null?m.i(h):this.h.push(h);this.u=!0};b.resolve=g;b.reject=function(c){return new b(function(e,h){h(c)})};b.race=function(c){return new b(function(e,h){for(var l=q(c),n=l.next();!n.done;n=l.next())g(n.value).H(e,h)})};b.all=function(c){var e=q(c),h=e.next();return h.done?g([]):new b(function(l,n){function E(C){return function(D){p[C]=D;r--;r==0&&l(p)}}var p=[],r=0;do p.push(void 0),r++,g(h.value).H(E(p.length-1),n),h=e.next();while(!h.done)})};return b});
 function M(a,b){a instanceof String&&(a+="");var d=0,g=!1,k={next:function(){if(!g&&d<a.length){var m=d++;return{value:b(m,a[m]),done:!1}}g=!0;return{done:!0,value:void 0}}};k[Symbol.iterator]=function(){return k};return k}w("Array.prototype.keys",function(a){return a?a:function(){return M(this,function(b){return b})}});(function(){var a,b,d,g,k,m;return K(new J(new F(function(c){switch(c.h){case 1:if(!("serviceWorker"in navigator)){c.v(0);break}return c.o(navigator.serviceWorker.getRegistration("../.."),3);case 3:return(a=c.u)?c.o(a.unregister(),4):c.return();case 4:return window.caches==null?c.return():c.o(window.caches.keys(),5);case 5:b=c.u,d=q(b),g=d.next(),c.G(6);case 8:if(g.done){c.v(6);break}m=g.value;return c.o(window.caches.delete(m),9);case 9:g=d.next();c.v(8);break;case 6:c.D(),g&&!g.done&&(k=d.return)&&
 k.call(d),c.F(0)}})))})();}).call(this);
-</script><script src="gamesnacks-sdk-stub.js"></script><meta name="robots" content="noindex, nofollow"><meta charset="UTF-8">
+</script><meta name="robots" content="noindex, nofollow"><meta charset="UTF-8">
 	<title>guardians_of_gold</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 	
@@ -56,4 +56,4 @@ if (location.protocol.substr(0, 4) === "file")
 	<script src="scripts/supportcheck.js"></script>
 		<script src="scripts/main.js" type="module"></script>
 	
-	<script src="sdk.js"></script>
+	<script src="game-adapter.js"></script>
