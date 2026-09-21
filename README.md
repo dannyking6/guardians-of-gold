@@ -1,109 +1,32 @@
-# Guardians of Gold — Version locale (hors-ligne)
-
-Jeu téléchargé depuis GameSnacks (Google) et rendu **100% jouable en local, sans
-aucune dépendance externe bloquante**.
-
-- **Moteur** : Construct 3 (Scirra) — runtime 100% web (JS/WebGL), ni Unity ni Godot
-- **Taille** : ~8.5 MB (runtime JS, spritesheets, 23 sons .webm, 3 polices, 2 squelettes Spine .scon)
-- **Dépendances externes restantes** : AUCUNE (prouvé par pare-feu applicatif)
+# Guardians Of Gold
 
 ## About the game
 
-**Guardians of Gold** is a delightful, family-friendly arcade defense game set in a
-medieval castle after dark. You are the castle's loyal guardian — and somewhere out
-there, a mischievous, quick-footed thief is prowling for your precious gold. Keep
-your eyes peeled, spot the sneaky intruder the moment he shows his face, and tap
-him away before your treasure disappears!
+Night falls over a medieval castle, the torches flicker, and somewhere in the
+shadows a quick-footed thief is circling your pile of gold. You are the castle's
+guardian: watch the scene, catch the tell-tale glint of movement, and tap the
+sneaky intruder the instant he shows his face — before he makes off with your
+treasure. Every round the thief gets bolder and faster, so reflexes and sharp
+eyes are everything.
 
-Charming hand-drawn 2D art, silky Spine skeletal animations, a living castle scene
-with flickering torches and swaying leaves, and 23 original sound effects make every
-round feel alive. The longer you hold the line, the bolder the thief gets — a simple
-premise with a genuinely rewarding difficulty curve. Easy to pick up, hard to put down.
+It is wonderfully pick-up-and-play: one finger, one decision, again and again.
+The living castle — swaying torchlight, playful animations, a cheeky villain
+with a sarcastic laugh — makes every successful swat feel earned, and every
+missed one makes you want just one more round. Easy to learn, genuinely hard
+to put down.
 
 ## Controls
 
-Designed for **one-finger play** — every interaction is a tap or a click:
+### Smartphone & tablet
 
-| Device | Input | Action |
-|---|---|---|
-| 📱 Smartphone / tablet (touch) | **Tap** | Swat the thief, navigate menus, confirm prompts, accept bonus offers |
-| 💻 PC / Mac (mouse) | **Left click** | Exactly the same as a tap |
-| 💻 Laptop (trackpad) | **Single click** | Exactly the same as a tap |
-| ⌨️ Keyboard | *Not required* | All gameplay is pointer/touch based |
+- **Tap** the thief the moment he appears to swat him away
+- **Tap** the buttons to navigate menus and confirm prompts
+- Best held upright (the game runs in portrait orientation)
 
-**Tips:**
-- The mouse fully emulates touch on desktop — the entire game is playable with
-clicks alone.
-- The game runs in **portrait orientation** (design resolution 640×1136). Hold your
-phone upright, or enjoy the auto-scaled layout on any screen size.
-- Works offline in any modern browser (Chrome, Firefox, Safari, Edge). No account,
-no download, no network needed.
+### Desktop
 
-## Lancer le jeu
+- **Left-click** the thief to catch him — the mouse fully replaces touch
+- **Left-click** the buttons to move through the menus
+- Click anywhere the action happens; no keyboard is needed
 
-Un serveur HTTP est nécessaire (le runtime Construct refuse `file://`) :
-
-```bash
-./serve.sh            # port 8777 par défaut
-# puis ouvrir http://localhost:8777
-```
-
-## Patches appliqués pour le mode hors-ligne
-
-| Fichier | Patch |
-|---|---|
-| `index.html` | SDK GameSnacks CDN retiré, remplacé par `game-adapter.js` ; retraits des scripts 404 (`offlineclient.js`, `register-sw.js`) |
-| `game-adapter.js` | **NOUVEAU** — couche d'adaptation neutre en 2 étages (voir ci-dessous) : pubs simulées (interstitial + rewarded auto-gratifié), audio activé, sauvegarde via localStorage (`local_save_*`) |
-| `scripts/c3main.js` | Sitelock neutralisé (2 fonctions obfusquées `Sitelock_Event3/7_Act9` remplacées par `AllOk=true`) |
-| `icons/loading-logo.png` | 404 Google remplacée par l'icône officielle 512×512 du jeu |
-
-**Aucune trace du SDK d'origine ne subsiste** : `sdk.js` (le pont GameSnacks) et
-le stub ont été supprimés. Le jeu n'appelle que des fonctions globales neutres
-(`gameReady`, `getItem`, `startRewardAd`…), re-implementées par l'adaptateur.
-
-## Architecture de l'adaptateur (pour brancher un autre SDK)
-
-```
-[Jeu Construct] --fonctions globales--> [PONT game-adapter.js] --interface--> [DRIVER]
-                                              |                        LocalDriver par défaut
-                                              |                        (ou window.GameDriver injecté)
-                        c3_callFunction (checksound, displayAdPrompt,
-                         gratifyUser, adNotAvailable, gamePause/Resume)
-```
-
-- **Le pont** expose les 12 fonctions globales que le jeu appelle et renvoie les
-events via `c3_callFunction`. Il ne connaît aucune plateforme.
-- **Le driver** implémente l'interface : `getAudioEnabled`, `onAudioChange`,
-`showInterstitialAd`, `requestRewardedAd`, `showRewardedAd`, `onGamePause/Resume`,
-`notifyReady/FirstFrame/GameOver/LevelComplete/Score`, `storageGet/Set/Remove/Clear`.
-- **Brancher un autre SDK** : définir `window.GameDriver = monImpl` avant le
-chargement de `game-adapter.js`. Aucune autre modification nécessaire.
-
-## Preuves de test (Playwright + pare-feu applicatif)
-
-- **0 requête externe** (toute URL non-localhost bloquée par route-interceptor)
-- 23/23 sons chargés depuis `media/` local
-- **Test unitaire du pont** : les 12 routes invoquées directement — `getData`,
-`checksound`, `displayAdPrompt`, `gratifyUser`, interstitiel complet, télémétrie,
-storage — toutes vérifiées, 0 erreur page
-- Flux complet joué par un bot :
-  - Splash → menu → jeu (`playbtn` cliqué)
-  - Pub rewarded simulée → `gratifyUser` → récompense accordée
-  - Tutoriel complété (`tapOnStudent=1` sauvegardé)
-  - ~150 taps CV (vision par ordinateur) sur le voleur en mouvement
-  - Fin de manche : `gameOver fired` → score sauvegardé (`setItem`)
-- 0 erreur fatale pendant les sessions de test (5 et 8 min)
-
-## Structure
-
-```
-index.html, data.json, appmanifest.json, style.css
-scripts/         runtime Construct (c3main.js, main.js, workers)
-images/          spritesheets
-media/           23 sons .webm
-fonts/           3 polices .ttf
-*.scon           squelettes d'animation Spine
-redblackset.js, pathfind.js   modules additionnels du jeu
-```
-
-*Projet de test à but éducatif — jeu © ses auteurs respectifs (Pass/Kbreindeergames, distribué via GameSnacks).*
+> Trackpad: single click = same as left-click.
